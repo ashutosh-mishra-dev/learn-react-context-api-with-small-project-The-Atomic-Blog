@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { faker } from "@faker-js/faker";
 
 function createRandomPost() {
@@ -24,10 +24,14 @@ function App() {
             .includes(searchQuery.toLowerCase())
         )
       : posts;
+  //-------------------------- useCallback ---------------------------------
+  //   3. useCallback (Function level)
+  // Kya karta hai: Function ko yaad rakhta hai, taaki same function reference use ho
+  // Useful hai jab aap child component me function pass kar rahe ho
 
-  function handleAddPost(post) {
+  const handleAddPost = useCallback(function handleAddPost(post) {
     setPosts((posts) => [post, ...posts]);
-  }
+  }, []);
 
   function handleClearPosts() {
     setPosts([]);
@@ -40,6 +44,11 @@ function App() {
     },
     [isFakeDark]
   );
+
+  //-------------------------- useMemo hook use for object ---------------------------------
+  //   🔹 2. useMemo (Value / Computation level)
+  // Kya karta hai: Agar koi heavy calculation hai, use yaad rakhta hai
+  // Agar dependencies same hai → fir se calculate mat karo
 
   const archiveOptions = useMemo(() => {
     return {
@@ -63,7 +72,7 @@ function App() {
         setSearchQuery={setSearchQuery}
       />
       <Main posts={searchedPosts} onAddPost={handleAddPost} />
-      <Archive archiveOptions={archiveOptions} />
+      <Archive archiveOptions={archiveOptions} onAddPost={handleAddPost} />
       <Footer />
     </section>
   );
@@ -160,7 +169,15 @@ function List({ posts }) {
   );
 }
 
-const Archive = memo(function Archive({ archiveOptions }) {
+// 1. React.memo
+// 👉 Kya hai?
+// Ye ek Higher Order Component (HOC) hai.
+// Ye kisi functional component ko "memorize" karta hai.
+// Matlab agar uske props change nahi hue, to React us component ko dobara render nahi karega.
+// 👉 Kyun use karte hain?
+// Performance optimize karne ke liye (unnecessary re-renders rokne ke liye).
+
+const Archive = memo(function Archive({ archiveOptions, onAddPost }) {
   // Here we don't need the setter function. We're only using state to store these posts because the callback function passed into useState (which generates the posts) is only called once, on the initial render. So we use this trick as an optimization technique, because if we just used a regular variable, these posts would be re-created on every render. We could also move the posts outside the components, but I wanted to show you this trick 😉
   const [posts] = useState(() =>
     // 💥 WARNING: This might make your computer slow! Try a smaller `length` first
@@ -183,7 +200,7 @@ const Archive = memo(function Archive({ archiveOptions }) {
               <p>
                 <strong>{post.title}:</strong> {post.body}
               </p>
-              {/* <button onClick={() => onAddPost(post)}>Add as new post</button> */}
+              <button onClick={() => onAddPost(post)}>Add as new post</button>
             </li>
           ))}
         </ul>
