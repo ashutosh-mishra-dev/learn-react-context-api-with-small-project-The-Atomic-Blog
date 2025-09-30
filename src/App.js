@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
+import { PostProvider, usePosts } from "./PostContext";
 
 import { faker } from "@faker-js/faker";
-import { PostProvider, usePosts } from "./PostProvider";
 
 function createRandomPost() {
   return {
@@ -21,14 +21,13 @@ function App() {
   );
 
   return (
-    // STEP 2 : PROVIDE VALUE TO CHILD COMPONENTS
     <section>
       <button
         onClick={() => setIsFakeDark((isFakeDark) => !isFakeDark)}
         className="btn-fake-dark-mode">
         {isFakeDark ? "☀️" : "🌙"}
       </button>
-
+      {/* STEP 4: wrap all needed component under PostProvider component of context api */}
       <PostProvider>
         <Header />
         <Main />
@@ -73,14 +72,14 @@ function Results() {
   return <p>🚀 {posts.length} atomic posts found</p>;
 }
 
-function Main() {
+const Main = memo(function Main() {
   return (
     <main>
       <FormAddPost />
       <Posts />
     </main>
   );
-}
+});
 
 function Posts() {
   return (

@@ -1,3 +1,13 @@
+// ------------------ context api -------------------------------
+//"Context API ek React feature hai jo hume global data share karne deta hai bina props drilling ke.
+// Ye ek Provider aur Consumer model pe kaam karta hai. Fayda ye hai ki code clean aur manageable ho jata hai,
+// lekin drawback ye hai ki frequent updates pe sabhi consumer components re-render hote hain."
+
+// Context API ke 3 main steps hote hain:
+// Step 1: Context create karo
+// Step 2: Provider banakar value pass karo
+// Step 3: Consumer (useContext hook se value use karo)
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { faker } from "@faker-js/faker";
 
@@ -7,7 +17,8 @@ function createRandomPost() {
     body: faker.hacker.phrase(),
   };
 }
-// STEP : 1
+// STEP 1 :  Context create karo
+
 const PostContext = createContext();
 function App() {
   const [posts, setPosts] = useState(() =>
@@ -42,7 +53,7 @@ function App() {
     [isFakeDark]
   );
   return (
-    // STEP 2 : PROVIDE VALUE TO CHILD COMPONENTS
+    // STEP 2 : PROVIDE VALUE TO CHILD COMPONENTS Provider banakar value pass karo
     <PostContext.Provider
       value={{
         posts: searchedPosts,
@@ -68,7 +79,7 @@ function App() {
 }
 
 function Header() {
-  // STEP 3: CONSUMING CONTEXT VALUE
+  // STEP 3: CONSUMING CONTEXT VALUE (useContext hook se value use karo)
   const { onClearPosts } = useContext(PostContext);
 
   return (

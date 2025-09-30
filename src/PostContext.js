@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useMemo, useState } from "react";
 
 import { faker } from "@faker-js/faker";
 import { useContext } from "react";
@@ -10,7 +10,7 @@ function createRandomPost() {
   };
 }
 
-// STEP : 1
+// STEP : 1 create context
 const PostContext = createContext();
 
 function PostProvider({ children }) {
@@ -37,20 +37,23 @@ function PostProvider({ children }) {
     setPosts([]);
   }
 
+  // hamne yha context api pr useMemo ko lagaya h becouse optimaization ho sake performance speed maintain ho sake
+  const value = useMemo(() => {
+    return {
+      posts: searchedPosts,
+      onAddPost: handleAddPost,
+      onClearPosts: handleClearPosts,
+      searchQuery,
+      setSearchQuery,
+    };
+  }, [searchedPosts, searchQuery]);
   return (
-    <PostContext.Provider
-      value={{
-        posts: searchedPosts,
-        onAddPost: handleAddPost,
-        onClearPosts: handleClearPosts,
-        searchQuery,
-        setSearchQuery,
-      }}>
-      {children}
-    </PostContext.Provider>
+    // step 2: set value in context provider
+    <PostContext.Provider value={value}>{children}</PostContext.Provider>
   );
 }
 
+// here we created custom hook for useContext
 function usePosts() {
   const context = useContext(PostContext);
   if (context === undefined)
